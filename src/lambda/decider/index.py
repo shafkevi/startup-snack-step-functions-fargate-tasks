@@ -7,7 +7,7 @@ def main(event, context):
     else:
         output = {"processor": random.choice(["both", "pi", "euler", "none"]), "digits": str(random.randint(1,25))}
 
-    print("Processor: {}").format(output["processor"])
+    print("Processor: {}".format(output["processor"]))
     print("Digits: {}".format(output["digits"]))
-    
+
     return output
