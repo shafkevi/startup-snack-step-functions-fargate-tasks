@@ -28,6 +28,7 @@ export interface FargateClusterProps {
   logGroupName: string,
   integrationPattern: IntegrationPattern,
   environment: TaskEnvironmentVariable[],
+  resultPath?: string,
 }
 
 export default class FargateCluster extends Construct {
@@ -46,7 +47,8 @@ export default class FargateCluster extends Construct {
       dockerfileLocation,
       logGroupName,
       integrationPattern,
-      environment
+      environment,
+      resultPath,
     } = props;
 
     this.taskDefinition = new FargateTaskDefinition(this, "FargateTaskDefinition", {
@@ -68,6 +70,7 @@ export default class FargateCluster extends Construct {
         cluster: cluster,
         taskDefinition: this.taskDefinition,
         assignPublicIp: true,
+        resultPath: resultPath ?? '$',
         containerOverrides: [
           {
             environment,

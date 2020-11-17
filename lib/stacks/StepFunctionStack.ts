@@ -35,6 +35,7 @@ export default class StepFunctionStack extends Stack {
       dockerfileLocation: join(__dirname, "../../src/fargate/pi"),
       repositoryName: "digits-of-pi",
       logGroupName: "PiLogGroup",
+      resultPath: "$.piValue",
       integrationPattern: IntegrationPattern.WAIT_FOR_TASK_TOKEN,
       environment: [
         {
@@ -56,6 +57,7 @@ export default class StepFunctionStack extends Stack {
       repositoryName: "digits-of-euler",
       logGroupName: "EulerLogGroup",
       integrationPattern: IntegrationPattern.RUN_JOB,
+      resultPath: "$.eulerValue",
       environment: [
         {
           name: "digits",
@@ -85,7 +87,9 @@ export default class StepFunctionStack extends Stack {
 
     const stateMachineDefinition = Chain.start(decider.task);
 
-    const staticParallelStep = new Parallel(this, "StaticParallelStep");
+    const staticParallelStep = new Parallel(this, "StaticParallelStep", {
+      resultPath: "$.parallelValues",
+    });
     staticParallelStep.branch(staticPi);
     staticParallelStep.branch(staticEuler);
     staticParallelStep.next(finishingStep);
