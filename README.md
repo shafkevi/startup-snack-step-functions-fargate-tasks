@@ -1,6 +1,6 @@
 # Step Functions with Fargate Tasks
 
-This project deploys a State Machine using AWS Step Functions, AWS Lambda and AWS Fargate backed Amazon Elastic Container Service (ECS) via [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/). 
+This project deploys a State Machine using [AWS Step Functions](https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html), [AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) and [AWS Fargate](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html) backed [Amazon Elastic Container Service (ECS)](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html) via [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/). 
 
 ## Setup
 
@@ -35,7 +35,7 @@ This project deploys a State Machine using AWS Step Functions, AWS Lambda and AW
 ![](img/state-machine.svg)
 
 #### Notes:
-+ The reason for running an ECS Task within a state machine with the TaskToken, instead of synchronously, is that it allows you to return data to the state machine. The synchronous process does not let you do this when running ECS Tasks. 
++ The reason for running an ECS Task within a state machine with the [TaskToken](https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token), instead of [synchronously](https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-sync), is that it allows you to return data to the state machine. The synchronous process does not let you do this when running ECS Tasks. 
 + When running the state machine, click on the `PiFargateTask` and compare the step output to the `EulerFargateTask` to see the difference in outputs.
   + Euler
   ![](img/euler-outputs.png)
