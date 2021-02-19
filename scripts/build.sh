@@ -7,5 +7,4 @@ mkdir -p dist
 npx tsc
 
 rsync -azr --delete secrets/ dist/secrets/
-rsync -azr --delete src/ dist/src/
-
+rsync -azr --delete assets/ dist/assets/
