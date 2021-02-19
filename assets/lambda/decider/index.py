@@ -1,4 +1,8 @@
 import random
 
 def main(event, context):
-    return {"processor": random.choice(["both", "pi", "euler", "none"]), "digits": str(random.randint(1,25))}
+    return {
+        "digits": str(random.randint(1, 25)),
+        "processor": (random.choice(["both", "pi", "euler", "none"])
+            if "processor" not in event else event["processor"])
+    }

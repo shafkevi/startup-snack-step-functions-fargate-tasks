@@ -86,31 +86,24 @@ export default class StepFunctionStack extends Stack {
 
     const finishingStep = new Pass(this, "FinishingStep");
 
-    const stateMachineDefinition = Chain.start(decider.task);
+    const staticParallelStep = new Parallel(this, "StaticParallelStep")
+      .branch(staticPi)
+      .branch(staticEuler)
+      .next(finishingStep);
 
-    const staticParallelStep = new Parallel(this, "StaticParallelStep");
-    staticParallelStep.branch(staticPi);
-    staticParallelStep.branch(staticEuler);
-    staticParallelStep.next(finishingStep);
-
-    const eulerProcess = Chain.start(euler.task);
-    eulerProcess.next(finishingStep);
-
-    const piProcess = Chain.start(pi.task);
-    piProcess.next(finishingStep);
-
-    const decisionStep = new Choice(this, "DecisionStep");
-    decisionStep
-      .when(Condition.stringEquals("$.processor", "euler"), eulerProcess)
-      .when(Condition.stringEquals("$.processor", "pi"), piProcess)
+    const decisionStep = new Choice(this, "DecisionStep")
+      .when(Condition.stringEquals("$.processor", "euler"), Chain
+        .start(euler.task)
+        .next(finishingStep))
+      .when(Condition.stringEquals("$.processor", "pi"), Chain
+        .start(pi.task)
+        .next(finishingStep))
       .when(Condition.stringEquals("$.processor", "both"), staticParallelStep)
       .otherwise(finishingStep);
 
-    stateMachineDefinition.next(decisionStep);
-
     const stateMachine = new StateMachine(this, "StateMachine", {
       stateMachineName: "StartupSnack-StepFunctionsFargateTasks",
-      definition: stateMachineDefinition
+      definition: Chain.start(decider.task).next(decisionStep)
     });
 
     stateMachine.grantTaskResponse(pi.taskDefinition.taskRole);
