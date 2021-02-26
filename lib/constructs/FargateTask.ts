@@ -27,6 +27,7 @@ export interface FargateClusterProps {
   logGroupName: string,
   memoryLimitMiB: number,
   repositoryName: string
+  resultPath?: string,
 }
 
 export default class FargateCluster extends Construct {
@@ -41,11 +42,10 @@ export default class FargateCluster extends Construct {
       cluster,
       cpu,
       dockerfileLocation,
-      environment,
       integrationPattern,
       logGroupName,
       memoryLimitMiB,
-      repositoryName
+      environment
     } = props;
 
     this.taskDefinition = new FargateTaskDefinition(this, "TaskDefinition", {

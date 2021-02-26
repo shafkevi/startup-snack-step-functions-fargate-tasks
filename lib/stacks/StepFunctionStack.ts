@@ -40,6 +40,7 @@ export default class StepFunctionStack extends Stack {
       dockerfileLocation: path.join(this.assetPath, "fargate", "pi"),
       repositoryName: "digits-of-pi",
       logGroupName: "PiLogGroup",
+      resultPath: "$.piValue",
       integrationPattern: IntegrationPattern.WAIT_FOR_TASK_TOKEN,
       environment: [
         {
@@ -61,6 +62,7 @@ export default class StepFunctionStack extends Stack {
       repositoryName: "digits-of-euler",
       logGroupName: "EulerLogGroup",
       integrationPattern: IntegrationPattern.RUN_JOB,
+      resultPath: "$.eulerValue",
       environment: [
         {
           name: "digits",
