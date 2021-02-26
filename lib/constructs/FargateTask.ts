@@ -1,83 +1,82 @@
 import { Construct } from "@aws-cdk/core";
+import { DockerImageAsset } from "@aws-cdk/aws-ecr-assets";
 
 import {
-  Cluster,
-  FargateTaskDefinition,
-  ContainerImage,
-  ContainerDefinition,
   AwsLogDriver,
+  Cluster,
+  ContainerDefinition,
+  ContainerImage,
   FargatePlatformVersion,
+  FargateTaskDefinition
 } from "@aws-cdk/aws-ecs";
 
 import {
-  EcsRunTask,
   EcsFargateLaunchTarget,
-  TaskEnvironmentVariable,
+  EcsRunTask,
+  TaskEnvironmentVariable
 } from "@aws-cdk/aws-stepfunctions-tasks";
-  
-import {
-  IntegrationPattern,
-} from "@aws-cdk/aws-stepfunctions";
+
+import { IntegrationPattern } from "@aws-cdk/aws-stepfunctions";
 
 export interface FargateClusterProps {
   cluster: Cluster,
   cpu: number,
-  memoryLimitMiB: number,
   dockerfileLocation: string,
-  repositoryName: string,
-  logGroupName: string,
-  integrationPattern: IntegrationPattern,
   environment: TaskEnvironmentVariable[],
+  integrationPattern: IntegrationPattern,
+  logGroupName: string,
+  memoryLimitMiB: number,
+  repositoryName: string
 }
 
 export default class FargateCluster extends Construct {
-  public readonly taskDefinition: FargateTaskDefinition;
   public readonly containerDefinition: ContainerDefinition;
   public readonly task: EcsRunTask;
+  public readonly taskDefinition: FargateTaskDefinition;
 
   constructor(scope: Construct, id: string, props: FargateClusterProps) {
     super(scope, id);
 
-    const { 
+    const {
       cluster,
       cpu,
-      memoryLimitMiB,
-      repositoryName,
       dockerfileLocation,
-      logGroupName,
+      environment,
       integrationPattern,
-      environment
+      logGroupName,
+      memoryLimitMiB,
+      repositoryName
     } = props;
 
-    this.taskDefinition = new FargateTaskDefinition(this, "FargateTaskDefinition", {
-      cpu: cpu,
-      memoryLimitMiB: memoryLimitMiB,
+    this.taskDefinition = new FargateTaskDefinition(this, "TaskDefinition", {
+      cpu,
+      memoryLimitMiB
     });
 
-    this.containerDefinition = this.taskDefinition.addContainer("FargateContainer", {
-      image: ContainerImage.fromAsset(
-        dockerfileLocation,
-        { repositoryName: repositoryName }
-      ),
+    const imageAsset = new DockerImageAsset(this, "ImageAsset", {
+      directory: dockerfileLocation
+    });
+
+    this.containerDefinition = this.taskDefinition.addContainer("Container", {
+      image: ContainerImage.fromDockerImageAsset(imageAsset),
       memoryLimitMiB: memoryLimitMiB,
-      logging: new AwsLogDriver({ streamPrefix: logGroupName})
+      logging: new AwsLogDriver({ streamPrefix: logGroupName })
     });
 
     this.task = new EcsRunTask(this, `${id}FargateTask`, {
-        integrationPattern,
-        cluster: cluster,
-        taskDefinition: this.taskDefinition,
-        assignPublicIp: true,
-        containerOverrides: [
-          {
-            environment,
-            containerDefinition: this.containerDefinition,
-          }
-        ],
-        launchTarget: new EcsFargateLaunchTarget({
-            platformVersion: FargatePlatformVersion.VERSION1_4
-        })
-     });
-
+      cluster,
+      integrationPattern,
+      assignPublicIp: true,
+      taskDefinition: this.taskDefinition,
+      containerOverrides: [
+        {
+          environment,
+          containerDefinition: this.containerDefinition
+        }
+      ],
+      launchTarget: new EcsFargateLaunchTarget({
+        platformVersion: FargatePlatformVersion.VERSION1_4
+      })
+    });
   }
 }

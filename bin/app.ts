@@ -1,8 +1,6 @@
-#!/usr/bin/env node
 import "source-map-support/register";
 import { App } from "@aws-cdk/core";
 import StepFunctionStack from "../lib/stacks/StepFunctionStack";
-
 
 const app = new App();
 
@@ -16,4 +14,4 @@ const props = {
   }
 };
 
-new StepFunctionStack(app, "StepFunctionStack", props);
+new StepFunctionStack(app, "StartupSnack-StepFunctionStack", props);
