@@ -1,25 +1,18 @@
-import { Construct } from "@aws-cdk/core";
+import { Construct } from "constructs";
 
-import {
-  Function,
-  Runtime,
-  AssetCode,
-} from "@aws-cdk/aws-lambda";
-
-import {
-  LambdaInvoke,
-} from "@aws-cdk/aws-stepfunctions-tasks";
+import { aws_lambda as lambda } from "aws-cdk-lib";
+import { aws_stepfunctions_tasks as stepfunctions_tasks } from "aws-cdk-lib";
 
 export interface LambdaTaskProps {
   codeLocation: string,
   handler: string,
-  runtime: Runtime,
+  runtime: lambda.Runtime,
   resultPath: string,
 }
 
 export default class LambdaTask extends Construct {
-  public readonly function: Function;
-  public readonly task: LambdaInvoke;
+  public readonly function: lambda.Function;
+  public readonly task: stepfunctions_tasks.LambdaInvoke;
 
   constructor(scope: Construct, id: string, props: LambdaTaskProps) {
     super(scope, id);
@@ -31,13 +24,13 @@ export default class LambdaTask extends Construct {
       resultPath,
     } = props;
 
-    this.function = new Function(this, "Function", {
+    this.function = new lambda.Function(this, "Function", {
       runtime: runtime,
       handler: handler,
-      code: new AssetCode(codeLocation),
+      code: new lambda.AssetCode(codeLocation),
     });
 
-    this.task = new LambdaInvoke(this, "LambdaTask", {
+    this.task = new stepfunctions_tasks.LambdaInvoke(this, "LambdaTask", {
       lambdaFunction: this.function,
       payloadResponseOnly: true,
       resultPath: resultPath,
